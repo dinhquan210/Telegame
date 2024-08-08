@@ -36,7 +36,7 @@ func main() {
 			}
 			timeSave := time.Now().Unix()
 			key := "btc_price_" + fmt.Sprint(timeSave)
-			rdb.Set(context.Background(), key, price, 15*time.Minute)
+			rdb.Set(context.Background(), key, price, 15*time.Second)
 		}
 	}()
 
@@ -62,7 +62,7 @@ func main() {
 		timeSubmit := time.Now().Unix()
 
 		userRequestKey := fmt.Sprint(user.Id) + "_" + fmt.Sprint(timeSubmit)
-		if err := rdb.SetNX(context.Background(), userRequestKey, request.PredictedValue, 10*time.Minute).Err(); err != nil {
+		if err := rdb.SetNX(context.Background(), userRequestKey, request.PredictedValue, 10*time.Second).Err(); err != nil {
 			fmt.Println(err)
 			return
 		}
