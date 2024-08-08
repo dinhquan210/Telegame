@@ -1,0 +1,5 @@
+development:
+  dialect: mysql
+  datasource: root:telegame@tcp(localhost:3306)/telegame?charset=utf8mb4&parseTime=True&loc=Local
+  dir: migrations
+  table: migrations
