@@ -5,5 +5,5 @@ type SubmitRequest struct {
 }
 
 type GetResultRequest struct {
-	TimeRes int64 `json:"timeRes"`
+	TimeRes int64 `json:"timeRes" form:"timeRes"`
 }

@@ -36,7 +36,7 @@ func main() {
 			}
 			timeSave := time.Now().Unix()
 			key := "btc_price_" + fmt.Sprint(timeSave)
-			rdb.Set(context.Background(), key, price, 15*time.Second)
+			rdb.Set(context.Background(), key, price, 15*time.Minute)
 		}
 	}()
 
@@ -61,8 +61,8 @@ func main() {
 		// save request redis
 		timeSubmit := time.Now().Unix()
 
-		userRequestKey := fmt.Sprint(user.Id + timeSubmit)
-		if err := rdb.SetNX(context.Background(), userRequestKey, request.PredictedValue, 10*time.Second).Err(); err != nil {
+		userRequestKey := fmt.Sprint(user.Id) + "_" + fmt.Sprint(timeSubmit)
+		if err := rdb.SetNX(context.Background(), userRequestKey, request.PredictedValue, 10*time.Minute).Err(); err != nil {
 			fmt.Println(err)
 			return
 		}
@@ -92,23 +92,25 @@ func main() {
 		}
 
 		timeSubmit := request.TimeRes - 5
+
+		fmt.Println("time submit", request)
 		// get data submit by user
-		userRequestKey := fmt.Sprint(user.Id + timeSubmit)
+		userRequestKey := fmt.Sprint(user.Id) + "_" + fmt.Sprint(timeSubmit)
 		value, err := rdb.Get(context.Background(), userRequestKey).Int()
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("get data user: "+userRequestKey, err)
 			return
 		}
 
 		priceBtcSubmit, err := rdb.Get(context.Background(), "btc_price_"+fmt.Sprint(timeSubmit)).Float64()
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("get data price submit :"+"btc_price_"+fmt.Sprint(timeSubmit), err)
 			return
 		}
 
 		priceBtcRes, err := rdb.Get(context.Background(), "btc_price_"+fmt.Sprint(request.TimeRes)).Float64()
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("get data price res :"+"btc_price_"+fmt.Sprint(request.TimeRes), err)
 			return
 		}
 
@@ -116,11 +118,11 @@ func main() {
 		dif := priceBtcRes - priceBtcSubmit
 		if dif > 0 && value == 1 {
 			response = "win"
-		} else if dif < 0 && value == 0 {
+		} else {
 			response = "lose"
 		}
 
-		// save history
+		//todo: save history
 
 		c.JSON(http.StatusOK, gin.H{
 			"message": "success",
